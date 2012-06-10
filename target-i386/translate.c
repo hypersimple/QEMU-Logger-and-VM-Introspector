@@ -7710,6 +7710,29 @@ void optimize_flags_init(void)
 #include "helper.h"
 }
 
+
+
+
+
+
+//newnew
+//For speeding up log
+//back
+
+//char logbuf[10000000];
+
+
+
+
+
+//newend
+
+
+
+
+
+
+
 /* generate intermediate code in gen_opc_buf and gen_opparam_buf for
    basic block 'tb'. If search_pc is TRUE, also generate PC
    information for each intermediate instruction. */
@@ -7895,8 +7918,26 @@ static inline void gen_intermediate_code_internal(CPUX86State *env,
 
 //newnew
 //Probably the state BEFORE the instructions
-        //qemu_log("                                          ");
-        //qemu_log("--------------------------------------\n");
+//int eflags;
+//cpu_synchronize_state(env);
+//eflags = env->eflags;
+
+
+qemu_log("& EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESP=%08x EBP=%08x ESI=%08x EDI=%08x CR3=%08x EIP=%08x\n",
+/* EFL=%08x [%c%c%c%c%c%c%c]*/
+          (uint32_t)env->regs[0], (uint32_t)env->regs[3], (uint32_t)env->regs[1], (uint32_t)env->regs[2], (uint32_t)env->regs[4], (uint32_t)env->regs[5], (uint32_t)env->regs[6], (uint32_t)env->regs[7], (uint32_t)env->cr[3], (uint32_t)env->eip); 
+          
+/*, eflags,         eflags & DF_MASK ? 'D' : '-',
+                    eflags & CC_O ? 'O' : '-',
+                    eflags & CC_S ? 'S' : '-',
+                    eflags & CC_Z ? 'Z' : '-',
+                    eflags & CC_A ? 'A' : '-',
+                    eflags & CC_P ? 'P' : '-',
+                    eflags & CC_C ? 'C' : '-'*/
+
+
+
+/*
         qemu_log("                                     ");
         qemu_log("--------------CPU_STATE:--------------\n");
         
@@ -7913,7 +7954,7 @@ static inline void gen_intermediate_code_internal(CPUX86State *env,
         qemu_log("                                     ");
         qemu_log("CR3=%08x  EIP=%08x\n", (uint32_t)env->cr[3], (uint32_t)env->eip);
         
-
+*/
 
 
 
@@ -7921,6 +7962,8 @@ static inline void gen_intermediate_code_internal(CPUX86State *env,
 
 
 
+//newnew
+//We can disable the in_asm log and use my "register log mechanism" to speed up the VM logging
 
 
         //qemu_log("--------------------------\n");
@@ -7933,6 +7976,10 @@ static inline void gen_intermediate_code_internal(CPUX86State *env,
             disas_flags = !dc->code32;
         log_target_disas(pc_start, pc_ptr - pc_start, disas_flags);
         qemu_log("\n");
+
+
+
+//newend
 
 
 

@@ -22,6 +22,7 @@
 #ifndef CONFIG_USER_ONLY
 #include "sysemu.h"
 #include "monitor.h"
+#include <string.h>
 #endif
 
 //#define DEBUG_MMU
@@ -174,6 +175,14 @@ done:
 #define DUMP_CODE_BYTES_TOTAL    50
 #define DUMP_CODE_BYTES_BACKWARD 20
 
+//newnew
+
+char tempbuf[5000];
+char logbuf[10100000];
+
+//newend
+
+
 void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
                     int flags)
 {
@@ -224,7 +233,11 @@ void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
     } else
 #endif
     {
-        cpu_fprintf(f, "EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n"
+    //newnew
+    //Comment out the rest to speed up logging, put the log into memory buffer instead of disk
+    
+    /*
+        sprintf(tempbuf, "EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n"
                     "ESI=%08x EDI=%08x EBP=%08x ESP=%08x\n"
                     "EIP=%08x EFL=%08x [%c%c%c%c%c%c%c] CPL=%d II=%d A20=%d SMM=%d HLT=%d\n",
                     (uint32_t)env->regs[R_EAX],
@@ -248,8 +261,52 @@ void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
                     (env->a20_mask >> 20) & 1,
                     (env->hflags >> HF_SMM_SHIFT) & 1,
                     env->halted);
+                    
+        strcat(logbuf,tempbuf);
+        if(strlen(logbuf)>1000)   //1000000000
+        {
+            cpu_fprintf(f, logbuf);
+            logbuf[0]='\0';
+        }
+    */
+    
+        //move the registers into one line, and plus "&"
+    
+        cpu_fprintf(f, "& EAX=%08x EBX=%08x ECX=%08x EDX=%08x "
+                    "ESI=%08x EDI=%08x EBP=%08x ESP=%08x "
+                    "EIP=%08x EFL=%08x [%c%c%c%c%c%c%c] CR3=%08x CPL=%d II=%d A20=%d SMM=%d HLT=%d\n",
+                    (uint32_t)env->regs[R_EAX],
+                    (uint32_t)env->regs[R_EBX],
+                    (uint32_t)env->regs[R_ECX],
+                    (uint32_t)env->regs[R_EDX],
+                    (uint32_t)env->regs[R_ESI],
+                    (uint32_t)env->regs[R_EDI],
+                    (uint32_t)env->regs[R_EBP],
+                    (uint32_t)env->regs[R_ESP],
+                    (uint32_t)env->eip, eflags,
+                    eflags & DF_MASK ? 'D' : '-',
+                    eflags & CC_O ? 'O' : '-',
+                    eflags & CC_S ? 'S' : '-',
+                    eflags & CC_Z ? 'Z' : '-',
+                    eflags & CC_A ? 'A' : '-',
+                    eflags & CC_P ? 'P' : '-',
+                    eflags & CC_C ? 'C' : '-',
+                    (uint32_t)env->cr[3],
+                    env->hflags & HF_CPL_MASK,
+                    (env->hflags >> HF_INHIBIT_IRQ_SHIFT) & 1,
+                    (env->a20_mask >> 20) & 1,
+                    (env->hflags >> HF_SMM_SHIFT) & 1,
+                    env->halted);
+    
+    
+    
     }
 
+    
+
+
+
+    /*
     for(i = 0; i < 6; i++) {
         cpu_x86_dump_seg_cache(env, f, cpu_fprintf, seg_name[i],
                                &env->segs[i]);
@@ -366,6 +423,8 @@ void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
         }
         cpu_fprintf(f, "\n");
     }
+    */
+    //newend
 }
 
 /***********************************************************/

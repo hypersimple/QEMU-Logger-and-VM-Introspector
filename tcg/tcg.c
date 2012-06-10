@@ -898,7 +898,13 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
 #endif
             if (!first_insn) 
                 fprintf(outfile, "\n");
+                
+            //newnew
+            //fprintf(outfile, "@ ---- 0x%" PRIx64, pc);
             fprintf(outfile, " ---- 0x%" PRIx64, pc);
+            
+            //newend
+            
             first_insn = 0;
             nb_oargs = def->nb_oargs;
             nb_iargs = def->nb_iargs;
@@ -912,7 +918,11 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
             nb_iargs = arg & 0xffff;
             nb_cargs = def->nb_cargs;
 
-            fprintf(outfile, " %s ", def->name);
+//newnew
+            fprintf(outfile, "# %s ", def->name);
+            //fprintf(outfile, " %s ", def->name);
+            //Add "#" to all the statements in the following
+//newend
 
             /* function name */
             fprintf(outfile, "%s",
@@ -947,7 +957,7 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
             nb_oargs = def->nb_oargs;
             nb_iargs = def->nb_iargs;
             nb_cargs = def->nb_cargs;
-            fprintf(outfile, " %s %s,$", def->name, 
+            fprintf(outfile, "# %s %s,$", def->name, 
                     tcg_get_arg_str_idx(s, buf, sizeof(buf), args[0]));
             val = args[1];
             th = tcg_find_helper(s, val);
@@ -960,7 +970,7 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
                     fprintf(outfile, "0x%" PRIx64 , (uint64_t)val);
             }
         } else {
-            fprintf(outfile, " %s ", def->name);
+            fprintf(outfile, "# %s ", def->name);
             if (c == INDEX_op_nopn) {
                 /* variable number of arguments */
                 nb_cargs = *args;
