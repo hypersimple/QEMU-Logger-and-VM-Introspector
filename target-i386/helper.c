@@ -175,11 +175,11 @@ done:
 #define DUMP_CODE_BYTES_TOTAL    50
 #define DUMP_CODE_BYTES_BACKWARD 20
 
-//newnew
-
+//newnew back
+/*
 char tempbuf[5000];
 char logbuf[10100000];
-
+*/
 //newend
 
 
@@ -235,6 +235,7 @@ void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
     {
     //newnew
     //Comment out the rest to speed up logging, put the log into memory buffer instead of disk
+
     
     /*
         sprintf(tempbuf, "EAX=%08x EBX=%08x ECX=%08x EDX=%08x\n"
@@ -305,8 +306,8 @@ void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
     
 
 
-
     /*
+    
     for(i = 0; i < 6; i++) {
         cpu_x86_dump_seg_cache(env, f, cpu_fprintf, seg_name[i],
                                &env->segs[i]);

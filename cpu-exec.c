@@ -182,8 +182,38 @@ static void cpu_handle_debug_exception(CPUArchState *env)
 
 volatile sig_atomic_t exit_request;
 
+//newnew
+int i;
+//int logbuf[10000000];
+int poffset = 0;
+typedef struct logstruct
+{
+    int eip; 
+    int cr3;
+    int eax;
+    int ebx;
+    int ecx;
+    int edx;
+    int esi;
+    int edi;
+    int ebp;
+    int esp;
+    int eflags;
+}logstruct;
+
+logstruct logbuf[2000000];
+
+
+//newend
+
 int cpu_exec(CPUArchState *env)
 {
+
+    //newnew
+    //extern exec_log;
+    //newend
+
+
     int ret, interrupt_request;
     TranslationBlock *tb;
     uint8_t *tc_ptr;
@@ -263,8 +293,7 @@ int cpu_exec(CPUArchState *env)
 
 
 
-//newnew
-//back
+//newnew back
 
             //next_tb = 0x4158e260;
 //	next_tb=1;
@@ -555,16 +584,92 @@ int cpu_exec(CPUArchState *env)
                     tb_invalidated_flag = 0;
                 }
 #ifdef CONFIG_DEBUG_EXEC
+
+//newnew
+//from qemu-log.h line 34
+#if defined(TARGET_I386)             
+                if (loglevel & CPU_LOG_EXEC) {
+                    logbuf[poffset].eip = tb->pc;
+                    logbuf[poffset].cr3 = (uint32_t)env->cr[3];
+                    logbuf[poffset].eax = (uint32_t)env->regs[R_EAX];
+                    logbuf[poffset].ebx = (uint32_t)env->regs[R_EBX];
+                    logbuf[poffset].ecx = (uint32_t)env->regs[R_ECX],
+                    logbuf[poffset].edx = (uint32_t)env->regs[R_EDX],
+                    logbuf[poffset].esi = (uint32_t)env->regs[R_ESI],
+                    logbuf[poffset].edi = (uint32_t)env->regs[R_EDI],
+                    logbuf[poffset].ebp = (uint32_t)env->regs[R_EBP],
+                    logbuf[poffset].esp = (uint32_t)env->regs[R_ESP],
+                    
+                    env->eflags = env->eflags | cpu_cc_compute_all(env, CC_OP)
+                        | (DF & DF_MASK);
+                    logbuf[poffset].eflags = env->eflags;
+                    env->eflags &= ~(DF_MASK | CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C);
+                    
+                    
+                    fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x\n",
+                            logbuf[i].eip,
+                            logbuf[i].cr3,
+                            logbuf[i].eax,
+                            logbuf[i].ebx,
+                            logbuf[i].ecx,
+                            logbuf[i].edx,
+                            logbuf[i].esi,
+                            logbuf[i].edi,
+                            logbuf[i].ebp,
+                            logbuf[i].esp,
+                            logbuf[i].eflags);
+                    
+                    
+                    //Single log enabled
+                    /*
+                    poffset++;
+                    
+                    if(poffset>=2000000) {                
+                        for(i=0;i<=1999999;i++)
+                        {
+                            fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x\n",
+                            logbuf[i].eip,
+                            logbuf[i].cr3,
+                            logbuf[i].eax,
+                            logbuf[i].ebx,
+                            logbuf[i].ecx,
+                            logbuf[i].edx,
+                            logbuf[i].esi,
+                            logbuf[i].edi,
+                            logbuf[i].ebp,
+                            logbuf[i].esp,
+                            logbuf[i].eflags);
+                        }
+                        //printf("Writing exec log data\n");
+                        poffset = 0;
+                    }
+                    */
+                }
+#endif
+
+/*
                 qemu_log_mask(CPU_LOG_EXEC, "Trace %p [" TARGET_FMT_lx "] %s\n",
                              tb->tc_ptr, tb->pc,
                              lookup_symbol(tb->pc));
+*/
+                           
+//newend
+
+
 #endif
+
+//newnew
+
                 /* see if we can patch the calling TB. When the TB
                    spans two pages, we cannot safely do a direct
                    jump. */
+                /*
                 if (next_tb != 0 && tb->page_addr[1] == -1) {
                     tb_add_jump((TranslationBlock *)(next_tb & ~3), next_tb & 3, tb);
                 }
+                */
+                
+//newend
                 spin_unlock(&tb_lock);
 
                 /* cpu_interrupt might be called while translating the

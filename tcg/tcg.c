@@ -899,7 +899,7 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
             if (!first_insn) 
                 fprintf(outfile, "\n");
                 
-            //newnew
+            //newnew back
             //fprintf(outfile, "@ ---- 0x%" PRIx64, pc);
             fprintf(outfile, " ---- 0x%" PRIx64, pc);
             

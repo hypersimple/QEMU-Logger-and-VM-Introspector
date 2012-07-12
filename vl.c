@@ -99,6 +99,17 @@
 int qemu_main(int argc, char **argv, char **envp);
 int main(int argc, char **argv)
 {
+
+    
+//newnew
+// Here we make an buffer cache for binary logging
+//int i;
+
+//FILE *exec_log;
+//exec_log = fopen("/tmp/qemunew.log", "a");
+//newend
+
+
     return qemu_main(argc, argv, NULL);
 }
 #undef main

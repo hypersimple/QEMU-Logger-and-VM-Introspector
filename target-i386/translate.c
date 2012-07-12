@@ -7916,16 +7916,33 @@ static inline void gen_intermediate_code_internal(CPUX86State *env,
 
 
 
-//newnew
+//newnew back
 //Probably the state BEFORE the instructions
 //int eflags;
 //cpu_synchronize_state(env);
 //eflags = env->eflags;
 
 
+
+
+/*
+
 qemu_log("& EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESP=%08x EBP=%08x ESI=%08x EDI=%08x CR3=%08x EIP=%08x\n",
+
+
+*/
+
 /* EFL=%08x [%c%c%c%c%c%c%c]*/
+
+
+/*
           (uint32_t)env->regs[0], (uint32_t)env->regs[3], (uint32_t)env->regs[1], (uint32_t)env->regs[2], (uint32_t)env->regs[4], (uint32_t)env->regs[5], (uint32_t)env->regs[6], (uint32_t)env->regs[7], (uint32_t)env->cr[3], (uint32_t)env->eip); 
+                    
+*/
+          
+          
+          
+          
           
 /*, eflags,         eflags & DF_MASK ? 'D' : '-',
                     eflags & CC_O ? 'O' : '-',
@@ -7962,7 +7979,7 @@ qemu_log("& EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESP=%08x EBP=%08x ESI=%08x EDI=%
 
 
 
-//newnew
+//newnew  back
 //We can disable the in_asm log and use my "register log mechanism" to speed up the VM logging
 
 
