@@ -65,7 +65,15 @@ cpu-exec.o: /home/cy/qemu/cpu-exec.c /home/cy/qemu/config.h \
  /home/cy/qemu/softmmu_header.h /home/cy/qemu/disas.h \
  /home/cy/qemu/tcg/tcg.h /home/cy/qemu/tcg/i386/tcg-target.h \
  /home/cy/qemu/tcg/tcg-runtime.h /home/cy/qemu/tcg/tcg-opc.h \
- /home/cy/qemu/qtest.h
+ /home/cy/qemu/qtest.h /home/cy/qemu/monitor.h /home/cy/qemu/qemu-char.h \
+ /home/cy/qemu/qemu-option.h /home/cy/qemu/qdict.h \
+ /home/cy/qemu/qobject.h /home/cy/qemu/qlist.h \
+ /home/cy/qemu/qemu-config.h /home/cy/qemu/qstring.h \
+ /home/cy/qemu/main-loop.h /home/cy/qemu/qerror.h \
+ /home/cy/qemu/qemu-error.h /home/cy/qemu/error.h /home/cy/qemu/block.h \
+ /home/cy/qemu/qemu-aio.h /home/cy/qemu/qemu-coroutine.h \
+ /home/cy/qemu/qemu-timer.h /home/cy/qemu/notify.h \
+ /home/cy/qemu/readline.h
 
 /home/cy/qemu/config.h:
 
@@ -276,3 +284,39 @@ config-target.h:
 /home/cy/qemu/tcg/tcg-opc.h:
 
 /home/cy/qemu/qtest.h:
+
+/home/cy/qemu/monitor.h:
+
+/home/cy/qemu/qemu-char.h:
+
+/home/cy/qemu/qemu-option.h:
+
+/home/cy/qemu/qdict.h:
+
+/home/cy/qemu/qobject.h:
+
+/home/cy/qemu/qlist.h:
+
+/home/cy/qemu/qemu-config.h:
+
+/home/cy/qemu/qstring.h:
+
+/home/cy/qemu/main-loop.h:
+
+/home/cy/qemu/qerror.h:
+
+/home/cy/qemu/qemu-error.h:
+
+/home/cy/qemu/error.h:
+
+/home/cy/qemu/block.h:
+
+/home/cy/qemu/qemu-aio.h:
+
+/home/cy/qemu/qemu-coroutine.h:
+
+/home/cy/qemu/qemu-timer.h:
+
+/home/cy/qemu/notify.h:
+
+/home/cy/qemu/readline.h:
