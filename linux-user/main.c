@@ -326,7 +326,10 @@ void cpu_loop(CPUX86State *env)
     target_siginfo_t info;
 
     for(;;) {
-        trapnr = cpu_x86_exec(env);
+        //newnew
+        trapnr = cpu_x86_exec(env,NULL);
+        //newend
+        //trapnr = cpu_x86_exec(env);
         switch(trapnr) {
         case 0x80:
             /* linux syscall from int $0x80 */

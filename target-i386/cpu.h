@@ -786,7 +786,9 @@ typedef struct CPUX86State {
 #include "cpu-qom.h"
 
 CPUX86State *cpu_x86_init(const char *cpu_model);
-int cpu_x86_exec(CPUX86State *s);
+//newnew
+int cpu_x86_exec(CPUX86State *s, void(*pmemsave_ptr)());
+//newend
 void x86_cpu_list (FILE *f, fprintf_function cpu_fprintf, const char *optarg);
 void x86_cpudef_setup(void);
 int cpu_x86_support_mca_broadcast(CPUX86State *env);

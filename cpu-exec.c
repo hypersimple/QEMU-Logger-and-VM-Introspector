@@ -28,6 +28,58 @@
 #include "cpu.h"
 #include "monitor.h"
 
+/*
+extern void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
+                Error **errp);
+*/
+/*
+#include "qmp-commands.h"
+#include "hmp.h"
+#include "qemu-timer.h"
+*/
+
+/*
+#include "qemu-common.h"
+//#include "cpu.h"
+//#include "tcg.h"
+#include "hw/hw.h"
+#include "hw/qdev.h"
+#include "osdep.h"
+#include "kvm.h"
+#include "hw/xen.h"
+#include "qemu-timer.h"
+#include "memory.h"
+#include "exec-memory.h"
+*/
+
+/*
+#include "config-host.h"
+
+#include "monitor.h"
+#include "sysemu.h"
+#include "gdbstub.h"
+#include "dma.h"
+#include "kvm.h"
+#include "qmp-commands.h"
+
+#include "qemu-thread.h"
+#include "cpus.h"
+#include "qtest.h"
+#include "main-loop.h"
+*/
+
+/*
+#include "qemu-common.h"
+#include "sysemu.h"
+#include "qmp-commands.h"
+#include "ui/qemu-spice.h"
+#include "ui/vnc.h"
+#include "kvm.h"
+#include "arch_init.h"
+#include "hw/qdev.h"
+#include "blockdev.h"
+#include "qemu/qom-qobject.h"
+*/
 
 //newend
 
@@ -195,6 +247,52 @@ volatile sig_atomic_t exit_request;
 
 
 //newnew
+/*
+void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
+                  Error **errp)
+{
+    FILE *f;
+    uint32_t l;
+    uint8_t buf[1024];
+
+    f = fopen(filename, "wb");
+    if (!f) {
+        error_set(errp, QERR_OPEN_FILE_FAILED, filename);
+        return;
+    }
+
+    while (size != 0) {
+        l = sizeof(buf);
+        if (l > size)
+            l = size;
+        cpu_physical_memory_rw(addr, buf, l, 0);
+        if (fwrite(buf, 1, l, f) != l) {
+            error_set(errp, QERR_IO_ERROR);
+            goto exit;
+        }
+        addr += l;
+        size -= l;
+    }
+
+exit:
+    fclose(f);
+}
+
+*/
+
+/*
+void new_pmemsave(filename1)
+{
+    uint32_t size = 536870912;
+    const char *filename = filename1;
+    uint64_t addr = 0;
+    Error *errp = NULL;
+
+    (*pmemsave_ptr)(addr, size, filename, &errp);
+    //hmp_handle_error(mon, &errp);
+}
+*/
+
 
 int get_virtual_address_value(CPUArchState *env, int addr)
 {
@@ -345,6 +443,8 @@ int get_virtual_address_value(CPUArchState *env, int addr)
 
 //newnew
 int i;
+int stopflag1 = 0;
+int stopflag2 = 0;
 //int logbuf[10000000];
 int poffset = 0;
 typedef struct logstruct
@@ -368,13 +468,18 @@ log_state_on = 0;
 
 //newend
 
+
+//newnew
+
+#if defined(TARGET_I386)
+int cpu_exec(CPUArchState *env, void (*pmemsave_ptr)())
+#else
 int cpu_exec(CPUArchState *env)
+#endif
+
+//newend
+
 {
-
-    //newnew
-    //extern exec_log;
-    //newend
-
 
     int ret, interrupt_request;
     TranslationBlock *tb;
@@ -751,7 +856,12 @@ int cpu_exec(CPUArchState *env)
 //from qemu-log.h line 34
 #if defined(TARGET_I386)
 
+
+
+    if (loglevel & CPU_LOG_EXEC) {
             //When GetFileAttributesExW == Y: start logging, Z: stop logging
+            
+        
             if (tb->pc == 0x7c811185) {
                 //printf("ESI: %08x\n",get_virtual_address_value(env,env->regs[R_ESI]));
                 //printf("EAX: %08x\n",get_virtual_address_value(env,env->regs[R_EAX]));
@@ -762,19 +872,61 @@ int cpu_exec(CPUArchState *env)
                 //printf("----------------------------------\n");
                 
                 //fprintf(logfile,"%08x\n",get_virtual_address_value(env,env->regs[R_ESI]));
+                
+                
                 int path = get_virtual_address_value(env,get_virtual_address_value(env,env->regs[R_ESP]+0x4));
+                
+                
                 if (path == 0x003a0059) {
-                    log_state_on = 1;
+                
+                    if (stopflag1 == 0) {
+                        log_state_on = 1;
+                        //new_pmemsave("xp_tmp1.dmp");
+                        //qmp_stop(NULL);
+                        //vm_stop(RUN_STATE_PAUSED);
+                        //hmp_stop(0, 0);
+                        /*
+                        uint32_t size1 = 536870912;
+                        const char *filename1 = "xp_tmp1.dmp";
+                        uint64_t addr1 = 0;
+                        Error *errp1 = NULL;
+                        */
+                        printf("STOPPED_1\n");
+                        (*pmemsave_ptr)(NULL);  // Actually, point to qmp_stop(NULL);
+                        stopflag1 = 1;
+                        //(*pmemsave_ptr)(addr1, size1, filename1, &errp1);
+                    }
+                    else {
+                        stopflag1 = 0;
+                    }
                 }
                 else if (path == 0x003a005a) {
-                    log_state_on = 0;
+                    if (stopflag2 == 0) { 
+                        log_state_on = 0;
+                        //qmp_stop(NULL);
+                        //new_pmemsave("xp_tmp2.dmp");
+                        //vm_stop(RUN_STATE_PAUSED);
+                        //hmp_stop(0, 0);
+                        /*
+                        uint32_t size1 = 536870912;
+                        const char *filename1 = "xp_tmp2.dmp";
+                        uint64_t addr1 = 0;
+                        Error *errp1 = NULL;
+                        */
+                        printf("STOPPED_2\n");
+                        (*pmemsave_ptr)(NULL);
+                        stopflag2 = 1;
+                        //(*pmemsave_ptr)(addr1, size1, filename1, &errp1);
+                    }
+                    else {
+                        stopflag2 = 0;
+                    }
                 }
             }
             
-            
             if (log_state_on == 1) {
              
-                if (loglevel & CPU_LOG_EXEC) {
+                //if (loglevel & CPU_LOG_EXEC) {
                     logbuf[poffset].eip = tb->pc;
                     logbuf[poffset].cr3 = (uint32_t)env->cr[3];
                     logbuf[poffset].eax = (uint32_t)env->regs[R_EAX];
@@ -833,9 +985,10 @@ int cpu_exec(CPUArchState *env)
                         poffset = 0;
                     }
                     */
-                }
+                //}
             
             }
+        }
 #endif
 
 /*

@@ -1094,7 +1094,19 @@ static int tcg_cpu_exec(CPUArchState *env)
         env->icount_decr.u16.low = decr;
         env->icount_extra = count;
     }
+    
+    //newnew
+    #if defined(TARGET_I386)
+    //ret = cpu_exec(env, qmp_pmemsave);
+    ret = cpu_exec(env, qmp_stop);
+    
+    #else
     ret = cpu_exec(env);
+    #endif
+    
+    
+    //newend
+    
 #ifdef CONFIG_PROFILER
     qemu_time += profile_getclock() - ti;
 #endif
@@ -1112,6 +1124,12 @@ static int tcg_cpu_exec(CPUArchState *env)
 static void tcg_exec_all(void)
 {
     int r;
+    
+    //newnew back
+    //void qmp_pmemsave(int64_t addr, int64_t size, const char *filename, Error **errp);
+                  
+   
+    //newend
 
     /* Account partial waits to the vm_clock.  */
     qemu_clock_warp(vm_clock);
@@ -1126,7 +1144,9 @@ static void tcg_exec_all(void)
                           (env->singlestep_enabled & SSTEP_NOTIMER) == 0);
 
         if (cpu_can_run(env)) {
+           
             r = tcg_cpu_exec(env);
+            
             if (r == EXCP_DEBUG) {
                 cpu_handle_guest_debug(env);
                 break;
@@ -1273,6 +1293,8 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
 exit:
     fclose(f);
 }
+//newnew back
+
 
 void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
                   Error **errp)
@@ -1303,6 +1325,9 @@ void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
 exit:
     fclose(f);
 }
+
+
+//newend
 
 void qmp_inject_nmi(Error **errp)
 {
