@@ -771,10 +771,10 @@ static void do_info_registers(Monitor *mon)
     CPUArchState *env;
     env = mon_get_cpu();
 
-//newnew
+//newnew back
 //flush the code cache
 
-    tb_flush(env);
+    //tb_flush(env);
 
 //newend
 #ifdef TARGET_I386
@@ -1970,8 +1970,18 @@ static void tlb_info(Monitor *mon)
 #endif
 
 static void do_info_mtree(Monitor *mon)
-{
-    mtree_info((fprintf_function)monitor_printf, mon);
+{   
+
+    //newnew
+    CPUArchState *env;
+    env = mon_get_cpu();
+    
+    //flush the code cache
+
+    tb_flush(env);
+
+    //mtree_info((fprintf_function)monitor_printf, mon);  //Previously, the only statement
+    //newend
 }
 
 

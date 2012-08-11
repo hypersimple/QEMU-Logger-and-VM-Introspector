@@ -460,6 +460,7 @@ typedef struct logstruct
     int ebp;
     int esp;
     int eflags;
+    int fs;
 }logstruct;
 
 logstruct logbuf[2000000];
@@ -821,6 +822,12 @@ int cpu_exec(CPUArchState *env)
                     cpu_loop_exit(env);
                 }
 #if defined(DEBUG_DISAS) || defined(CONFIG_DEBUG_EXEC)
+
+                //newnew
+                //only "log cpu" when "log exec" is ON
+
+            if ( (loglevel & CPU_LOG_EXEC) && (log_state_on == 1) ) {
+            
                 if (qemu_loglevel_mask(CPU_LOG_TB_CPU)) {
                     /* restore flags in standard format */
 #if defined(TARGET_I386)
@@ -838,6 +845,11 @@ int cpu_exec(CPUArchState *env)
                     log_cpu_state(env, 0);
 #endif
                 }
+                
+            }
+                //newend
+                
+                
 #endif /* DEBUG_DISAS || CONFIG_DEBUG_EXEC */
                 spin_lock(&tb_lock);
                 tb = tb_find_fast(env);
@@ -862,7 +874,7 @@ int cpu_exec(CPUArchState *env)
             //When GetFileAttributesExW == Y: start logging, Z: stop logging
             
         
-            if (tb->pc == 0x7c811185) {
+            if (tb->pc == 0x78b0379c) {
                 //printf("ESI: %08x\n",get_virtual_address_value(env,env->regs[R_ESI]));
                 //printf("EAX: %08x\n",get_virtual_address_value(env,env->regs[R_EAX]));
 
@@ -873,11 +885,14 @@ int cpu_exec(CPUArchState *env)
                 
                 //fprintf(logfile,"%08x\n",get_virtual_address_value(env,env->regs[R_ESI]));
                 
+                // if the function is getfileattributeexw, no need to +6
+                int path = get_virtual_address_value(env,get_virtual_address_value(env,env->regs[R_ESP]+0x4)+6);
                 
-                int path = get_virtual_address_value(env,get_virtual_address_value(env,env->regs[R_ESP]+0x4));
+                //printf("%08x\n",path);
+                //printf("%08x\n",env->regs[R_ESP]);
                 
-                
-                if (path == 0x003a0059) {
+                // XXX: the path should be reverse order, little endian
+                if (path == 0x3155454e) {
                 
                     if (stopflag1 == 0) {
                         log_state_on = 1;
@@ -900,7 +915,7 @@ int cpu_exec(CPUArchState *env)
                         stopflag1 = 0;
                     }
                 }
-                else if (path == 0x003a005a) {
+                else if (path == 0x3255454e) {
                     if (stopflag2 == 0) { 
                         log_state_on = 0;
                         //qmp_stop(NULL);
@@ -931,13 +946,13 @@ int cpu_exec(CPUArchState *env)
                     logbuf[poffset].cr3 = (uint32_t)env->cr[3];
                     logbuf[poffset].eax = (uint32_t)env->regs[R_EAX];
                     logbuf[poffset].ebx = (uint32_t)env->regs[R_EBX];
-                    logbuf[poffset].ecx = (uint32_t)env->regs[R_ECX],
-                    logbuf[poffset].edx = (uint32_t)env->regs[R_EDX],
-                    logbuf[poffset].esi = (uint32_t)env->regs[R_ESI],
-                    logbuf[poffset].edi = (uint32_t)env->regs[R_EDI],
-                    logbuf[poffset].ebp = (uint32_t)env->regs[R_EBP],
-                    logbuf[poffset].esp = (uint32_t)env->regs[R_ESP],
-                    
+                    logbuf[poffset].ecx = (uint32_t)env->regs[R_ECX];
+                    logbuf[poffset].edx = (uint32_t)env->regs[R_EDX];
+                    logbuf[poffset].esi = (uint32_t)env->regs[R_ESI];
+                    logbuf[poffset].edi = (uint32_t)env->regs[R_EDI];
+                    logbuf[poffset].ebp = (uint32_t)env->regs[R_EBP];
+                    logbuf[poffset].esp = (uint32_t)env->regs[R_ESP];
+                    logbuf[poffset].fs = (uint32_t)env->segs[4].base;
                     
                     env->eflags = env->eflags | cpu_cc_compute_all(env, CC_OP)
                         | (DF & DF_MASK);
@@ -946,7 +961,7 @@ int cpu_exec(CPUArchState *env)
                     
                     //fprintf(logfile,"%d\n",log_state_on);
                     
-                    fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x\n",
+                    fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x FS_BASE=%08x\n",
                             logbuf[i].eip,
                             logbuf[i].cr3,
                             logbuf[i].eax,
@@ -957,7 +972,8 @@ int cpu_exec(CPUArchState *env)
                             logbuf[i].edi,
                             logbuf[i].ebp,
                             logbuf[i].esp,
-                            logbuf[i].eflags);
+                            logbuf[i].eflags,
+                            logbuf[i].fs);
                     
                     //printf("%08x\n",get_virtual_address_value(env));
                     

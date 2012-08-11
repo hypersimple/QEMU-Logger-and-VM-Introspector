@@ -306,7 +306,7 @@ void cpu_dump_state(CPUX86State *env, FILE *f, fprintf_function cpu_fprintf,
     
 
 
-
+    
     
     for(i = 0; i < 6; i++) {
         cpu_x86_dump_seg_cache(env, f, cpu_fprintf, seg_name[i],
