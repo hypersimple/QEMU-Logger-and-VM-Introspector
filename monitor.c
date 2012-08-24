@@ -787,8 +787,14 @@ static void do_info_registers(Monitor *mon)
 }
 
 static void do_info_jit(Monitor *mon)
-{
-    dump_exec_info((FILE *)mon, monitor_fprintf);
+{   
+    dump_exec_info((FILE *)mon, monitor_fprintf);   //new_original_chenyue
+    
+    //newnew
+    extern temp1;
+    temp1 = 1 - temp1;
+    printf("temp1(the log flag): %d\n",temp1);
+    //newend
 }
 
 static void do_info_history(Monitor *mon)

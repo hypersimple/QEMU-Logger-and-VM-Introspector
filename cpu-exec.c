@@ -438,14 +438,19 @@ int get_virtual_address_value(CPUArchState *env, int addr)
 
 
 
-
-
-
 //newnew
+
+//CPUX86State pre_env;
+CPUArchState pre_env;
+
+int temp1 = 0;
+int mycount = 0;
+
+
 int i;
 int stopflag1 = 0;
 int stopflag2 = 0;
-//int logbuf[10000000];
+
 int poffset = 0;
 typedef struct logstruct
 {
@@ -461,6 +466,20 @@ typedef struct logstruct
     int esp;
     int eflags;
     int fs;
+    
+    int type;
+    
+    int count;
+    int intno;
+    int error_code;
+    int is_int;
+    int intflag;
+    int intcs;
+    int inteip;
+    int pc;
+    int intss;
+    int intesp;
+    
 }logstruct;
 
 logstruct logbuf[2000000];
@@ -574,6 +593,41 @@ int cpu_exec(CPUArchState *env)
 
 
             for(;;) {
+            
+            
+            
+                //newnew back
+                /*
+                #if defined(TARGET_I386)
+                    if (loglevel & CPU_LOG_EXEC) {
+                        
+                        if (temp1 == 0) {
+                            do_interrupt_x86_hardirq(env, 0x88, 1);
+	                        next_tb = 0;
+	                        temp1 = 1;
+                        }
+                        
+                        //mycount += 1;
+                        
+                        
+                       // if (env->eip == 0x78b037ec) {
+                       //     env->eip = 0x804df104;
+                       // }
+                       
+                        if (env->eip == 0x78b037cc) {
+                            //do_interrupt_x86_hardirq(env, 0x89, 1);
+                            //env->eip = 0x804df107;
+                            *env = pre_env;
+                            env->eip = 0x804df107;
+                        }
+                        
+                    }
+                #endif
+                */
+                //newend
+            
+            
+            
                 interrupt_request = env->interrupt_request;
                 if (unlikely(interrupt_request)) {
                     if (unlikely(env->singlestep_enabled & SSTEP_NOIRQ)) {
@@ -596,6 +650,55 @@ int cpu_exec(CPUArchState *env)
                     }
 #endif
 #if defined(TARGET_I386)
+
+                    /*
+                    //newnewadd back
+                    if (loglevel & CPU_LOG_EXEC) {
+                        
+                        if (temp1 == 0) {
+                            //0xbf803ccc When starting up	        
+	                        //tb->pc = 0x78b0379c;
+	                        env->eip = 0xbf803ccc;
+	                        printf("%08x\n",tb->pc);
+	                        next_tb = 0;
+	                        //current_pc = 0x1;
+	                        //new_eip = 0x1;
+	                        //env->regs[R_EAX] = 0x54321;
+	                        temp1 = 1;
+                        }
+                        
+                    }
+                    //newendadd
+                    */
+                    
+                    /*
+                    //newnew back
+                    if (loglevel & CPU_LOG_EXEC) {
+                        if (temp1 == 0) {
+                            CPUArchState *env2;
+                            env2 = env;
+                            env2->regs[R_EAX] = 0x54321;
+                            env2->eip = 0xbf803ccc;
+                            do_interrupt_x86_hardirq(env2, 0x88, 1);
+                            next_tb = 0;
+                            //0xbf803ccc When starting up	        
+	                        //tb->pc = 0x78b0379c;
+	                        //env->eip = 0xbf803ccc;
+	                        //printf("%08x\n",tb->pc);
+	                        //current_pc = 0x1;
+	                        //new_eip = 0x1;
+	                        //env->regs[R_EAX] = 0x54321;
+	                        temp1 = 1;
+                        }
+                        
+                    }
+                    //newend
+                    */
+
+
+
+
+
                     if (interrupt_request & CPU_INTERRUPT_INIT) {
                             svm_check_intercept(env, SVM_EXIT_INIT);
                             do_cpu_init(env);
@@ -824,7 +927,7 @@ int cpu_exec(CPUArchState *env)
 #if defined(DEBUG_DISAS) || defined(CONFIG_DEBUG_EXEC)
 
                 //newnew
-                //only "log cpu" when "log exec" is ON
+                //only  when "log exec" is ON, "log cpu"
 
             if ( (loglevel & CPU_LOG_EXEC) && (log_state_on == 1) ) {
             
@@ -939,10 +1042,11 @@ int cpu_exec(CPUArchState *env)
                 }
             }
             
-            if (log_state_on == 1) {
+            if (1 /*log_state_on == 1*/) {    //XXX:Changed
              
                 //if (loglevel & CPU_LOG_EXEC) {
-                    logbuf[poffset].eip = tb->pc;
+                    //logbuf[poffset].eip = tb->pc;
+                    logbuf[poffset].eip = env->eip;
                     logbuf[poffset].cr3 = (uint32_t)env->cr[3];
                     logbuf[poffset].eax = (uint32_t)env->regs[R_EAX];
                     logbuf[poffset].ebx = (uint32_t)env->regs[R_EBX];
@@ -960,7 +1064,7 @@ int cpu_exec(CPUArchState *env)
                     env->eflags &= ~(DF_MASK | CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C);
                     
                     //fprintf(logfile,"%d\n",log_state_on);
-                    
+                    /*
                     fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x FS_BASE=%08x\n",
                             logbuf[i].eip,
                             logbuf[i].cr3,
@@ -974,17 +1078,17 @@ int cpu_exec(CPUArchState *env)
                             logbuf[i].esp,
                             logbuf[i].eflags,
                             logbuf[i].fs);
-                    
+                    */
                     //printf("%08x\n",get_virtual_address_value(env));
                     
-                    //Single log enabled
-                    /*
+                    //Single log disabled
+                    
                     poffset++;
                     
                     if(poffset>=2000000) {                
                         for(i=0;i<=1999999;i++)
                         {
-                            fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x\n",
+                            fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x FS_BASE=%08x\n",
                             logbuf[i].eip,
                             logbuf[i].cr3,
                             logbuf[i].eax,
@@ -995,12 +1099,13 @@ int cpu_exec(CPUArchState *env)
                             logbuf[i].edi,
                             logbuf[i].ebp,
                             logbuf[i].esp,
-                            logbuf[i].eflags);
+                            logbuf[i].eflags,
+                            logbuf[i].fs);
                         }
                         //printf("Writing exec log data\n");
                         poffset = 0;
                     }
-                    */
+                    
                 //}
             
             }
