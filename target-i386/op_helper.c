@@ -26,6 +26,10 @@
 #include "cpu-defs.h"
 #include "helper.h"
 
+//newnew
+#include "target-i386/mydef.h"
+//newend
+
 #if !defined(CONFIG_USER_ONLY)
 #include "softmmu_exec.h"
 #endif /* !defined(CONFIG_USER_ONLY) */
@@ -1654,6 +1658,101 @@ static void handle_even_inj(int intno, int is_int, int error_code,
  * the int instruction. next_eip is the EIP value AFTER the interrupt
  * instruction. It is only relevant if is_int is TRUE.
  */
+
+
+//newnew
+
+extern logstruct logbuf[];
+extern poffset;
+
+
+static void do_interrupt_all(int intno, int is_int, int error_code,
+                             target_ulong next_eip, int is_hw)
+{
+    if (qemu_loglevel_mask(CPU_LOG_INT)) {
+    
+        
+    
+        if ((env->cr[0] & CR0_PE_MASK)) {
+            static int count;
+            
+            logbuf[poffset].type = 456;
+            logbuf[poffset].count = count;
+            logbuf[poffset].intno = intno;
+            logbuf[poffset].error_code = error_code;
+            logbuf[poffset].is_int = is_int;
+            logbuf[poffset].intflag = env->hflags & HF_CPL_MASK;
+            logbuf[poffset].intcs = env->segs[R_CS].selector;
+            logbuf[poffset].inteip = EIP;
+            logbuf[poffset].pc = (int)env->segs[R_CS].base + EIP;
+            logbuf[poffset].intss = env->segs[R_SS].selector;
+            logbuf[poffset].intesp = ESP;
+            
+            poffset++;
+            
+            /*
+            qemu_log("%6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx,
+                    count, intno, error_code, is_int,
+                    env->hflags & HF_CPL_MASK,
+                    env->segs[R_CS].selector, EIP,
+                    (int)env->segs[R_CS].base + EIP,
+                    env->segs[R_SS].selector, ESP);
+            if (intno == 0x0e) {
+                qemu_log(" CR2=" TARGET_FMT_lx, env->cr[2]);
+            } else {
+                qemu_log(" EAX=" TARGET_FMT_lx, EAX);
+            }
+            qemu_log("\n");
+            log_cpu_state(env, X86_DUMP_CCOP);
+            */
+#if 0
+            {
+                int i;
+                target_ulong ptr;
+                qemu_log("       code=");
+                ptr = env->segs[R_CS].base + env->eip;
+                for(i = 0; i < 16; i++) {
+                    qemu_log(" %02x", ldub(ptr + i));
+                }
+                qemu_log("\n");
+            }
+#endif
+            count++;
+        }
+    }
+    if (env->cr[0] & CR0_PE_MASK) {
+#if !defined(CONFIG_USER_ONLY)
+        if (env->hflags & HF_SVMI_MASK)
+            handle_even_inj(intno, is_int, error_code, is_hw, 0);
+#endif
+#ifdef TARGET_X86_64
+        if (env->hflags & HF_LMA_MASK) {
+            do_interrupt64(intno, is_int, error_code, next_eip, is_hw);
+        } else
+#endif
+        {
+            do_interrupt_protected(intno, is_int, error_code, next_eip, is_hw);
+        }
+    } else {
+#if !defined(CONFIG_USER_ONLY)
+        if (env->hflags & HF_SVMI_MASK)
+            handle_even_inj(intno, is_int, error_code, is_hw, 1);
+#endif
+        do_interrupt_real(intno, is_int, error_code, next_eip);
+    }
+
+#if !defined(CONFIG_USER_ONLY)
+    if (env->hflags & HF_SVMI_MASK) {
+	    uint32_t event_inj = ldl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj));
+	    stl_phys(env->vm_vmcb + offsetof(struct vmcb, control.event_inj), event_inj & ~SVM_EVTINJ_VALID);
+    }
+#endif
+}
+
+
+
+#if 0
+
 static void do_interrupt_all(int intno, int is_int, int error_code,
                              target_ulong next_eip, int is_hw)
 {
@@ -1716,6 +1815,14 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
     }
 #endif
 }
+
+#endif
+
+//newend
+
+
+
+
 
 void do_interrupt(CPUX86State *env1)
 {

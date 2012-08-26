@@ -1,3 +1,5 @@
+//defined by yuechen
+
 typedef struct logstruct
 {
     int eip; 

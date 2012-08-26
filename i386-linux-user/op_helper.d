@@ -65,7 +65,7 @@ op_helper.o: /home/cy/qemu/target-i386/op_helper.c \
  /home/cy/qemu/ioport.h /home/cy/qemu/iorange.h /home/cy/qemu/qemu-log.h \
  /home/cy/qemu/target-i386/helper.h /home/cy/qemu/def-helper.h \
  /home/cy/qemu/target-i386/ops_sse_header.h \
- /home/cy/qemu/target-i386/ops_sse.h \
+ /home/cy/qemu/target-i386/mydef.h /home/cy/qemu/target-i386/ops_sse.h \
  /home/cy/qemu/target-i386/helper_template.h
 
 /home/cy/qemu/target-i386/cpu.h:
@@ -277,6 +277,8 @@ config-target.h:
 /home/cy/qemu/def-helper.h:
 
 /home/cy/qemu/target-i386/ops_sse_header.h:
+
+/home/cy/qemu/target-i386/mydef.h:
 
 /home/cy/qemu/target-i386/ops_sse.h:
 

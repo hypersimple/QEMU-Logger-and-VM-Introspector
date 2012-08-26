@@ -73,7 +73,7 @@ cpu-exec.o: /home/cy/qemu/cpu-exec.c /home/cy/qemu/config.h \
  /home/cy/qemu/qemu-error.h /home/cy/qemu/error.h /home/cy/qemu/block.h \
  /home/cy/qemu/qemu-aio.h /home/cy/qemu/qemu-coroutine.h \
  /home/cy/qemu/qemu-timer.h /home/cy/qemu/notify.h \
- /home/cy/qemu/readline.h
+ /home/cy/qemu/readline.h /home/cy/qemu/target-i386/mydef.h
 
 /home/cy/qemu/config.h:
 
@@ -318,3 +318,5 @@ config-target.h:
 /home/cy/qemu/notify.h:
 
 /home/cy/qemu/readline.h:
+
+/home/cy/qemu/target-i386/mydef.h:

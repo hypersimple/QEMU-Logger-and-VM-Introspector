@@ -28,6 +28,8 @@
 #include "cpu.h"
 #include "monitor.h"
 
+#include "target-i386/mydef.h"
+
 /*
 extern void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
                 Error **errp);
@@ -452,37 +454,8 @@ int stopflag1 = 0;
 int stopflag2 = 0;
 
 int poffset = 0;
-typedef struct logstruct
-{
-    int eip; 
-    int cr3;
-    int eax;
-    int ebx;
-    int ecx;
-    int edx;
-    int esi;
-    int edi;
-    int ebp;
-    int esp;
-    int eflags;
-    int fs;
-    
-    int type;
-    
-    int count;
-    int intno;
-    int error_code;
-    int is_int;
-    int intflag;
-    int intcs;
-    int inteip;
-    int pc;
-    int intss;
-    int intesp;
-    
-}logstruct;
 
-logstruct logbuf[2000000];
+logstruct logbuf[1000000];
 
 log_state_on = 0;
 
@@ -1044,7 +1017,8 @@ int cpu_exec(CPUArchState *env)
             
             if (1 /*log_state_on == 1*/) {    //XXX:Changed
              
-                //if (loglevel & CPU_LOG_EXEC) {
+                
+                    logbuf[poffset].type = 123;
                     //logbuf[poffset].eip = tb->pc;
                     logbuf[poffset].eip = env->eip;
                     logbuf[poffset].cr3 = (uint32_t)env->cr[3];
@@ -1085,28 +1059,47 @@ int cpu_exec(CPUArchState *env)
                     
                     poffset++;
                     
-                    if(poffset>=2000000) {                
-                        for(i=0;i<=1999999;i++)
+                    if(poffset>=1000000) { 
+                    
+                        for(i=0;i<=999999;i++)
                         {
-                            fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x FS_BASE=%08x\n",
-                            logbuf[i].eip,
-                            logbuf[i].cr3,
-                            logbuf[i].eax,
-                            logbuf[i].ebx,
-                            logbuf[i].ecx,
-                            logbuf[i].edx,
-                            logbuf[i].esi,
-                            logbuf[i].edi,
-                            logbuf[i].ebp,
-                            logbuf[i].esp,
-                            logbuf[i].eflags,
-                            logbuf[i].fs);
+                            if(logbuf[i].type == 123) {
+                        
+                                fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x FS_BASE=%08x\n",
+                                logbuf[i].eip,
+                                logbuf[i].cr3,
+                                logbuf[i].eax,
+                                logbuf[i].ebx,
+                                logbuf[i].ecx,
+                                logbuf[i].edx,
+                                logbuf[i].esi,
+                                logbuf[i].edi,
+                                logbuf[i].ebp,
+                                logbuf[i].esp,
+                                logbuf[i].eflags,
+                                logbuf[i].fs
+                                );
+                            }
+                            
+                            else if (logbuf[i].type == 456) {
+                                fprintf(logfile,"%6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx "\n",
+                                
+                                logbuf[i].count,
+                                logbuf[i].intno,
+                                logbuf[i].error_code,
+                                logbuf[i].is_int,
+                                logbuf[i].intflag,
+                                logbuf[i].intcs,
+                                logbuf[i].inteip,
+                                logbuf[i].pc,
+                                logbuf[i].intss,
+                                logbuf[i].intesp
+                                );
+                            }
                         }
                         //printf("Writing exec log data\n");
                         poffset = 0;
                     }
-                    
-                //}
             
             }
         }
