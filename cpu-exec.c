@@ -296,7 +296,7 @@ void new_pmemsave(filename1)
 */
 
 
-int get_virtual_address_value(CPUArchState *env, int addr)
+int get_vir_addr_value(CPUArchState *env, int addr)
 {
     int format = 'x';
     int count = 1;
@@ -449,15 +449,18 @@ int temp1 = 0;
 int mycount = 0;
 
 
-int i;
+int i=0;
 int stopflag1 = 0;
 int stopflag2 = 0;
+int stopflag3 = 0;
 
 int poffset = 0;
 
 logstruct logbuf[1000000];
 
 log_state_on = 0;
+
+temp2 = 0;
 
 //newend
 
@@ -569,34 +572,63 @@ int cpu_exec(CPUArchState *env)
             
             
             
-                //newnew back
-                /*
+                //newnew
+                //newhere
+                #if 0
+                
                 #if defined(TARGET_I386)
+                    //if ( (loglevel & CPU_LOG_EXEC) && (log_state_on == 1) ) {
                     if (loglevel & CPU_LOG_EXEC) {
-                        
-                        if (temp1 == 0) {
-                            do_interrupt_x86_hardirq(env, 0x88, 1);
-	                        next_tb = 0;
-	                        temp1 = 1;
+                    
+                        if (temp1 == 0) {    
+                            //if (env->eip == 0x40c1f7) {
+                            //if (env->eip == 0xc5274c) {
+                            //if (env->eip == 0x00c4d1e0 && env->regs[R_ESP]==0x0012aa6c) {
+                            if (1) {
+                            //7c924ea1
+                                //if (env->regs[R_EDI] == 0x156) {
+                                    printf("Here we go!\n");
+                                    
+                                        if (stopflag3 == 0) {
+                                            printf("TEMP_FLAG\n");
+                                            //(*pmemsave_ptr)(NULL);
+                                            stopflag3 = 1;
+                                        }
+                                        do_interrupt_x86_hardirq(env, 0x88, 1);
+	                                    next_tb = 0;
+	                                    temp1 = 1;
+                                    
+                                //}
+                            }
                         }
-                        
-                        //mycount += 1;
-                        
-                        
-                       // if (env->eip == 0x78b037ec) {
-                       //     env->eip = 0x804df104;
-                       // }
-                       
-                        if (env->eip == 0x78b037cc) {
-                            //do_interrupt_x86_hardirq(env, 0x89, 1);
-                            //env->eip = 0x804df107;
-                            *env = pre_env;
-                            env->eip = 0x804df107;
-                        }
+
+                            //if (env->eip == 0x40c230) {
+                            
+                            if (tb->pc == 0x013f60b3) {
+                            //7c810ea6
+                                if (temp2 == 0 && temp1 ==1) {
+                                    do_interrupt_x86_hardirq(env, 0x89, 1);
+                                    next_tb = 0;
+                                    temp2 = 1;
+                                    
+                                    /*
+                                    if (temp2 == 0) {
+                                        *env = pre_env;
+                                        env->eip = 0x804df107;
+                                        //env->eip = 0x7c924ea1;
+                                        next_tb = 0;
+                                        temp2 = 1;
+                                    }
+                                    */
+                                }
+                            }
+
                         
                     }
                 #endif
-                */
+                
+                #endif
+
                 //newend
             
             
@@ -949,43 +981,33 @@ int cpu_exec(CPUArchState *env)
     if (loglevel & CPU_LOG_EXEC) {
             //When GetFileAttributesExW == Y: start logging, Z: stop logging
             
-        
+            //if (tb->pc == 0x7c9100a4) {
             if (tb->pc == 0x78b0379c) {
-                //printf("ESI: %08x\n",get_virtual_address_value(env,env->regs[R_ESI]));
-                //printf("EAX: %08x\n",get_virtual_address_value(env,env->regs[R_EAX]));
-
-                //printf("4SP: %08x\n", get_virtual_address_value(env,get_virtual_address_value(env,env->regs[R_ESP]+0x4)));
-                //printf("ESP: %08x\n",get_virtual_address_value(env,(env->regs[R_ESP]-4)));
-                //printf("ESP: %08x\n",get_virtual_address_value(env,env->regs[R_ESP]));
-                //printf("----------------------------------\n");
                 
-                //fprintf(logfile,"%08x\n",get_virtual_address_value(env,env->regs[R_ESI]));
                 
                 // if the function is getfileattributeexw, no need to +6
-                int path = get_virtual_address_value(env,get_virtual_address_value(env,env->regs[R_ESP]+0x4)+6);
+                int path = get_vir_addr_value(env,get_vir_addr_value(env,env->regs[R_ESP]+0x4)+6);
                 
-                //printf("%08x\n",path);
-                //printf("%08x\n",env->regs[R_ESP]);
+                int theString_addr = get_vir_addr_value(env,env->regs[R_ESP]+0x4);
+                
+                int ii = 0;
+                
+                for(ii=0; (0xff & get_vir_addr_value(env,theString_addr+ii)) != 0xa;ii++) {
+                    printf("%c",(0xff & (get_vir_addr_value(env,theString_addr+ii))));
+                }
+                printf("\n");
+                
+                //newhere
                 
                 // XXX: the path should be reverse order, little endian
                 if (path == 0x3155454e) {
                 
                     if (stopflag1 == 0) {
                         log_state_on = 1;
-                        //new_pmemsave("xp_tmp1.dmp");
-                        //qmp_stop(NULL);
-                        //vm_stop(RUN_STATE_PAUSED);
-                        //hmp_stop(0, 0);
-                        /*
-                        uint32_t size1 = 536870912;
-                        const char *filename1 = "xp_tmp1.dmp";
-                        uint64_t addr1 = 0;
-                        Error *errp1 = NULL;
-                        */
+
                         printf("STOPPED_1\n");
-                        (*pmemsave_ptr)(NULL);  // Actually, point to qmp_stop(NULL);
+                        //(*pmemsave_ptr)(NULL);  // Actually, point to qmp_stop(NULL);
                         stopflag1 = 1;
-                        //(*pmemsave_ptr)(addr1, size1, filename1, &errp1);
                     }
                     else {
                         stopflag1 = 0;
@@ -994,29 +1016,75 @@ int cpu_exec(CPUArchState *env)
                 else if (path == 0x3255454e) {
                     if (stopflag2 == 0) { 
                         log_state_on = 0;
-                        //qmp_stop(NULL);
-                        //new_pmemsave("xp_tmp2.dmp");
-                        //vm_stop(RUN_STATE_PAUSED);
-                        //hmp_stop(0, 0);
-                        /*
-                        uint32_t size1 = 536870912;
-                        const char *filename1 = "xp_tmp2.dmp";
-                        uint64_t addr1 = 0;
-                        Error *errp1 = NULL;
-                        */
+
                         printf("STOPPED_2\n");
                         (*pmemsave_ptr)(NULL);
                         stopflag2 = 1;
-                        //(*pmemsave_ptr)(addr1, size1, filename1, &errp1);
                     }
                     else {
                         stopflag2 = 0;
                     }
                 }
+               
+                
+                
+            #if 0
+            // XXX: the path should be reverse order, little endian
+                
+                if (path == 0x3255454e) {
+                    if (stopflag2 == 0) { 
+                        log_state_on = 0;
+
+                        printf("STOPPED_2\n");
+                        (*pmemsave_ptr)(NULL);
+                        stopflag2 = 1;
+                    }
+                    else {
+                        stopflag2 = 0;
+                    }
+                }
+             #endif  
+                
+                
+            
+                
+            }   //this brace usually leads to error
+            
+            #if 0    
+                log_state_on = 1;
+                
+                //printf("STOPPED_1\n");
+                //(*pmemsave_ptr)(NULL);  // Actually, point to qmp_stop(NULL);
+                
+                
+                
             }
             
-            if (1 /*log_state_on == 1*/) {    //XXX:Changed
+            
+            //else if (tb->pc == 0x7c81cafa) {
+            //else if (tb->pc == 0x10008720) {
+            else if (tb->pc == 0x12121212) {
+                log_state_on = 0;
+                //printf("STOPPED_2\n");
+                //(*pmemsave_ptr)(NULL);  // Actually, point to qmp_stop(NULL);
+            }
+            
+            #endif
+            
+            if (/*log_state_on == 1*/1) {    //XXX:Changed
              
+
+
+
+
+
+
+
+
+// single step logging start
+#if 0
+
+                    poffset = 0; // this is ensured for single step logging
                 
                     logbuf[poffset].type = 123;
                     //logbuf[poffset].eip = tb->pc;
@@ -1037,8 +1105,8 @@ int cpu_exec(CPUArchState *env)
                     logbuf[poffset].eflags = env->eflags;
                     env->eflags &= ~(DF_MASK | CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C);
                     
-                    //fprintf(logfile,"%d\n",log_state_on);
-                    /*
+                    i = 0; // this is ensured for single step logging
+                    
                     fprintf(logfile,"@ EIP=%08x CR3=%08x EAX=%08x EBX=%08x ECX=%08x EDX=%08x ESI=%08x EDI=%08x EBP=%08x ESP=%08x EFLAGS=%08x FS_BASE=%08x\n",
                             logbuf[i].eip,
                             logbuf[i].cr3,
@@ -1052,10 +1120,39 @@ int cpu_exec(CPUArchState *env)
                             logbuf[i].esp,
                             logbuf[i].eflags,
                             logbuf[i].fs);
-                    */
-                    //printf("%08x\n",get_virtual_address_value(env));
+   
+#endif
+// single step logging end
+
+
+
+
+
+// buffer logging start
+//#if 0
                     
-                    //Single log disabled
+                    logbuf[poffset].type = 123;
+                    //logbuf[poffset].eip = tb->pc;
+                    logbuf[poffset].eip = env->eip;
+                    logbuf[poffset].cr3 = (uint32_t)env->cr[3];
+                    logbuf[poffset].eax = (uint32_t)env->regs[R_EAX];
+                    logbuf[poffset].ebx = (uint32_t)env->regs[R_EBX];
+                    logbuf[poffset].ecx = (uint32_t)env->regs[R_ECX];
+                    logbuf[poffset].edx = (uint32_t)env->regs[R_EDX];
+                    logbuf[poffset].esi = (uint32_t)env->regs[R_ESI];
+                    logbuf[poffset].edi = (uint32_t)env->regs[R_EDI];
+                    logbuf[poffset].ebp = (uint32_t)env->regs[R_EBP];
+                    logbuf[poffset].esp = (uint32_t)env->regs[R_ESP];
+                    logbuf[poffset].fs = (uint32_t)env->segs[4].base;
+                    
+                    env->eflags = env->eflags | cpu_cc_compute_all(env, CC_OP)
+                        | (DF & DF_MASK);
+                    logbuf[poffset].eflags = env->eflags;
+                    env->eflags &= ~(DF_MASK | CC_O | CC_S | CC_Z | CC_A | CC_P | CC_C);
+                    
+                    
+
+
                     
                     poffset++;
                     
@@ -1097,10 +1194,23 @@ int cpu_exec(CPUArchState *env)
                                 );
                             }
                         }
-                        //printf("Writing exec log data\n");
                         poffset = 0;
                     }
-            
+
+
+//#endif
+// buffer logging end
+
+
+
+
+
+
+
+
+
+
+    
             }
         }
 #endif

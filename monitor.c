@@ -73,6 +73,13 @@
 #endif
 #include "hw/lm32_pic.h"
 
+
+
+//newnew
+
+#include "softmmu-semi.h"
+//newend
+
 //#define DEBUG
 //#define DEBUG_COMPLETION
 
@@ -1444,6 +1451,74 @@ static void do_sendkey(Monitor *mon, const QDict *qdict)
                    muldiv64(get_ticks_per_sec(), hold_time, 1000));
 }
 
+
+
+
+//newnew
+
+
+static void do_sendkey1(Monitor *mon)
+{
+    char keyname_buf[16];
+    char *separator;
+    int keyname_len, keycode, i;
+    //const char *string = qdict_get_str(qdict, "string");
+    const char *string = "ctrl-shift-o";
+    //int has_hold_time = qdict_haskey(qdict, "hold_time");
+    int has_hold_time = 100;
+    //int hold_time = qdict_get_try_int(qdict, "hold_time", -1);
+    int hold_time = 100;
+
+    if (nb_pending_keycodes > 0) {
+        qemu_del_timer(key_timer);
+        release_keys(NULL);
+    }
+    if (!has_hold_time)
+        hold_time = 100;
+    i = 0;
+    while (1) {
+        separator = strchr(string, '-');
+        keyname_len = separator ? separator - string : strlen(string);
+        if (keyname_len > 0) {
+            pstrcpy(keyname_buf, sizeof(keyname_buf), string);
+            if (keyname_len > sizeof(keyname_buf) - 1) {
+                monitor_printf(mon, "invalid key: '%s...'\n", keyname_buf);
+                return;
+            }
+            if (i == MAX_KEYCODES) {
+                monitor_printf(mon, "too many keys\n");
+                return;
+            }
+            keyname_buf[keyname_len] = 0;
+            keycode = get_keycode(keyname_buf);
+            if (keycode < 0) {
+                monitor_printf(mon, "unknown key: '%s'\n", keyname_buf);
+                return;
+            }
+            keycodes[i++] = keycode;
+        }
+        if (!separator)
+            break;
+        string = separator + 1;
+    }
+    nb_pending_keycodes = i;
+    /* key down events */
+    for (i = 0; i < nb_pending_keycodes; i++) {
+        keycode = keycodes[i];
+        if (keycode & 0x80)
+            kbd_put_keycode(0xe0);
+        kbd_put_keycode(keycode & 0x7f);
+    }
+    /* delayed key up events */
+    qemu_mod_timer(key_timer, qemu_get_clock_ns(vm_clock) +
+                   muldiv64(get_ticks_per_sec(), hold_time, 1000));
+}
+
+
+//newend
+
+
+
 static int mouse_button_state;
 
 static void do_mouse_move(Monitor *mon, const QDict *qdict)
@@ -1694,7 +1769,19 @@ static void tlb_info(Monitor *mon)
     CPUArchState *env;
 
     env = mon_get_cpu();
+    
+    
+    
+    //newnew
+    
+    target_phys_addr_t addr = 0x00120000;
 
+    softmmu_tput32(env,addr,0x12345678);
+    //newend
+    
+    //newnew
+    #if 0
+    
     if (!(env->cr[0] & CR0_PG_MASK)) {
         monitor_printf(mon, "PG disabled\n");
         return;
@@ -1711,6 +1798,9 @@ static void tlb_info(Monitor *mon)
     } else {
         tlb_info_32(mon, env);
     }
+    #endif
+    
+    //newend
 }
 
 static void mem_print(Monitor *mon, target_phys_addr_t *pstart,
@@ -1995,18 +2085,37 @@ static void do_info_mtree(Monitor *mon)
     
 
 static void do_info_numa(Monitor *mon)
-{
+{   
+    do_sendkey1(mon);
 
+    #if 0
+    
     int format = 'x';
     int count = 1;
     int wsize = 4;
-    target_phys_addr_t addr = 0x80550f50;
+    //target_phys_addr_t addr = 0x80550f50;
+    target_phys_addr_t addr = 0x00120000;
     int is_physical = 0;
     
     CPUArchState *env;
     int l, line_size, i, max_digits, len;
     uint8_t buf[16];
     uint64_t v;
+    
+    //env = mon_get_cpu();
+    //softmmu_tput32(env,addr,0x12345678);
+    /*
+    l = 1;
+    //uint32_t myvalue = 0x12345678;
+    static const uint8_t myvalue = 0xcc;
+    //buf = (uint32_t *)&myvalue;
+    if (cpu_memory_rw_debug(env, addr, (uint8_t *)&myvalue, l, 1) <0) {
+        printf("WTF!");
+    }
+    */
+    
+    
+    
 
     if (format == 'i') {
         int flags;
@@ -2119,7 +2228,7 @@ static void do_info_numa(Monitor *mon)
         len -= l;
     }
 
-
+    #endif
 }
 
 

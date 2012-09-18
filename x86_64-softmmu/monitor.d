@@ -98,7 +98,8 @@ monitor.o: /home/cy/qemu/monitor.c /home/cy/qemu/hw/hw.h \
  /home/cy/qemu/json-lexer.h /home/cy/qemu/json-parser.h \
  /home/cy/qemu/trace/control.h /home/cy/qemu/memory.h \
  /home/cy/qemu/qmp-commands.h /home/cy/qemu/hmp.h \
- /home/cy/qemu/hw/lm32_pic.h hmp-commands.h qmp-commands-old.h
+ /home/cy/qemu/hw/lm32_pic.h /home/cy/qemu/softmmu-semi.h hmp-commands.h \
+ qmp-commands-old.h
 
 /home/cy/qemu/hw/hw.h:
 
@@ -471,6 +472,8 @@ config-target.h:
 /home/cy/qemu/hmp.h:
 
 /home/cy/qemu/hw/lm32_pic.h:
+
+/home/cy/qemu/softmmu-semi.h:
 
 hmp-commands.h:
 

@@ -769,18 +769,20 @@ do {\
 static void do_interrupt_protected(int intno, int is_int, int error_code,
                                    unsigned int next_eip, int is_hw)
 {
-
     //newnew
+
+
     extern CPUX86State pre_env;
-    
     int esp_temp = env->regs[R_ESP];
-    
+
+
     if (intno == 0x88) {
 
+    //is_int = 1;
+    printf("enter the interrupt 0x88\n");
 
-
-
-
+    #if 0
+    
     SegmentCache *dt;
     target_ulong ptr, ssp;
     int type, dpl, selector, ss_dpl, cpl;
@@ -983,52 +985,55 @@ static void do_interrupt_protected(int intno, int is_int, int error_code,
         env->eflags &= ~IF_MASK;
     }
     env->eflags &= ~(TF_MASK | VM_MASK | RF_MASK | NT_MASK);
-
-
-
-
+    
+    #endif
 
         pre_env = *env;
         
-        CPUX86State new_env;
+        //CPUX86State new_env;
+        
+        //new_env = *env;
+
         
         
-        //memcpy(&new_env,env,sizeof(CPUX86State));
-        //new_env
-        new_env = *env;
+        //new_env.eip = 0x7c924ea1;
         
-        //change the env value
-        
-        //new_env.eip = 0x78b0379c;
-        
-        //env->eip = 0x806eed34;
-        //env->eip = 0x806eed54;
-        //env->eip = 0x13c65fc;
-        //env->eip = 0x804df107;
-        
-        new_env.eip = 0xc33df1;
         //env->cr[3];
-        new_env.regs[R_EAX] = 0x1;
-        new_env.regs[R_EBX] = 0x037f03b0;
-        new_env.regs[R_ECX] = 0x00000000;
-        new_env.regs[R_EDX] = 0x00000008;
-        new_env.regs[R_ESI] = 0x01e33e00;
-        new_env.regs[R_EDI] = 0x01e2d820;
+        //new_env.regs[R_EAX] = 0x1;
+        //new_env.regs[R_EBX] = 0x00000006;
+        //new_env.regs[R_ECX] = 0x00000000;
+        //new_env.regs[R_EDX] = 0x00000008;
+        //new_env.regs[R_ESI] = 0x01e33e00;
+        //new_env.regs[R_EDI] = 0x01e2d820;
         //new_env.regs[R_EBP] = 0x0012b140;
         //new_env.regs[R_ESP] = 0x0012abf0;
-        new_env.regs[R_ESP] = esp_temp;
+        
+        //new_env.regs[R_ESP] = esp_temp;
+        
         //env->eflags = 0x00000202;   //XXX:maybe wrong
         //env->segs[4].base = 0x7ffde000;      //fs_base different
         
-        //end of changing the env value
+        //change the env value
+        //*env = new_env;
         
-        *env = new_env;
+        //---------------------------------------------
         
-        //(*env).regs[R_EAX] = new_env.regs[R_EAX];
-        //(*env).regs[R_EBP] = new_env.regs[R_EBP];
-        //(*env).regs[R_ESP] = new_env.regs[R_ESP];
-        //(*env).eip = new_env.eip;
+        //newhere
+        
+        env->eip = 0x00c4d1e0;
         //env->eip = 0x78b0379c;
+        /*
+        env->regs[R_EAX] = 0x037e03d8;
+        env->regs[R_EBX] = 0x01f33860;
+        env->regs[R_ECX] = 0x037e03d8;
+        env->regs[R_EDX] = 0x1;
+        env->regs[R_ESI] = 0x1;
+        env->regs[R_EDI] = 0x1;
+        env->regs[R_EBP] = 0x1;
+        env->regs[R_ESP] = 0x1;
+        */
+        
+
     } 
 
     else if (intno == 0x89) {
@@ -1665,6 +1670,8 @@ static void handle_even_inj(int intno, int is_int, int error_code,
 extern logstruct logbuf[];
 extern poffset;
 
+// buf int log start
+//#if 0
 
 static void do_interrupt_all(int intno, int is_int, int error_code,
                              target_ulong next_eip, int is_hw)
@@ -1689,6 +1696,9 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
             logbuf[poffset].intesp = ESP;
             
             poffset++;
+            
+            
+            log_cpu_state(env, X86_DUMP_CCOP);
             
             /*
             qemu_log("%6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx,
@@ -1749,8 +1759,16 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
 #endif
 }
 
+//#endif
+// buf int log end
 
 
+
+
+
+
+
+//single int log start
 #if 0
 
 static void do_interrupt_all(int intno, int is_int, int error_code,
@@ -1816,9 +1834,16 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
 #endif
 }
 
+
 #endif
+//single int log end
 
 //newend
+
+
+
+
+
 
 
 
@@ -1920,7 +1945,6 @@ void do_interrupt_x86_hardirq(CPUX86State *env1, int intno, int is_hw)
 
 
 
-
     CPUX86State *saved_env;
 
     saved_env = env;
@@ -1928,7 +1952,7 @@ void do_interrupt_x86_hardirq(CPUX86State *env1, int intno, int is_hw)
     do_interrupt_all(intno, 0, 0, 0, is_hw);
     env = saved_env;
     
-    //newnew
+    //newnew back
     //}
     //newend
 }
