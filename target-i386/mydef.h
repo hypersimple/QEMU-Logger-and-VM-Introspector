@@ -1,5 +1,16 @@
 //defined by yuechen
 
+#include "uthash.h"
+
+typedef struct example_user_t {
+    uint64_t eip_addr;
+    char *string;
+    UT_hash_handle hh;
+} example_user_t;
+
+
+
+
 typedef struct logstruct
 {
     int eip; 

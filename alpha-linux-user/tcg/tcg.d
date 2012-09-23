@@ -66,6 +66,8 @@ tcg/tcg.o: /home/cy/qemu/tcg/tcg.c /home/cy/qemu/config.h \
  /home/cy/qemu/tcg/tcg-op.h /home/cy/qemu/tcg/tcg.h \
  /home/cy/qemu/tcg/i386/tcg-target.h /home/cy/qemu/tcg/tcg-runtime.h \
  /home/cy/qemu/tcg/tcg-opc.h /home/cy/qemu/elf.h \
+ /home/cy/qemu/tcg/../target-i386/mydef.h \
+ /home/cy/qemu/tcg/../target-i386/uthash.h \
  /home/cy/qemu/tcg/i386/tcg-target.c
 
 /home/cy/qemu/config.h:
@@ -281,5 +283,9 @@ config-target.h:
 /home/cy/qemu/tcg/tcg-opc.h:
 
 /home/cy/qemu/elf.h:
+
+/home/cy/qemu/tcg/../target-i386/mydef.h:
+
+/home/cy/qemu/tcg/../target-i386/uthash.h:
 
 /home/cy/qemu/tcg/i386/tcg-target.c:

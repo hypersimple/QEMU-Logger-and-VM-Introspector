@@ -462,6 +462,11 @@ log_state_on = 0;
 
 temp2 = 0;
 
+int OP_FLAG = 1;
+
+example_user_t *user, *users=NULL;
+
+
 //newend
 
 
@@ -1176,6 +1181,16 @@ int cpu_exec(CPUArchState *env)
                                 logbuf[i].eflags,
                                 logbuf[i].fs
                                 );
+                                
+                                
+                                if (OP_FLAG == 1) {
+                                    example_user_t *tmp1;
+                                    uint64_t eip_key = logbuf[i].eip;
+                                    HASH_FIND_INT(users,&eip_key,tmp1);
+                                    //printf("%s",tmp1->string);
+                                    fprintf(logfile,"%s",tmp1->string);
+                                }
+                                
                             }
                             
                             else if (logbuf[i].type == 456) {
