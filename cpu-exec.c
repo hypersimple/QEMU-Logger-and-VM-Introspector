@@ -986,6 +986,29 @@ int cpu_exec(CPUArchState *env)
     if (loglevel & CPU_LOG_EXEC) {
             //When GetFileAttributesExW == Y: start logging, Z: stop logging
             
+            
+            if (tb->pc == 0x7e42a01e) {
+            
+                if ((uint32_t)env->regs[R_EBP] == 0x202) {
+                
+                    if (stopflag1 == 0) {
+                        log_state_on = 1;
+
+                        printf("STOPPED_1\n");
+                        (*pmemsave_ptr)(NULL);  // Actually, point to qmp_stop(NULL);
+                        stopflag1 = 1;
+                    }
+                    else {
+                        stopflag1 = 0;
+                    }
+                }
+            
+            }
+            
+            
+            
+            
+            
             //if (tb->pc == 0x7c9100a4) {
             if (tb->pc == 0x78b0379c) {
                 
@@ -1003,7 +1026,7 @@ int cpu_exec(CPUArchState *env)
                 printf("\n");
                 
                 //newhere
-                
+                # if 0
                 // XXX: the path should be reverse order, little endian
                 if (path == 0x3155454e) {
                 
@@ -1018,7 +1041,10 @@ int cpu_exec(CPUArchState *env)
                         stopflag1 = 0;
                     }
                 }
-                else if (path == 0x3255454e) {
+                #endif
+                
+                if (path == 0x3255454e) {
+                //else if (path == 0x3255454e) {
                     if (stopflag2 == 0) { 
                         log_state_on = 0;
 
@@ -1076,7 +1102,7 @@ int cpu_exec(CPUArchState *env)
             
             #endif
             
-            if (/*log_state_on == 1*/1) {    //XXX:Changed
+            if (log_state_on == 1) {    //XXX:Changed
              
 
 
@@ -1087,7 +1113,7 @@ int cpu_exec(CPUArchState *env)
 
 
 // single step logging start
-#if 0
+//#if 0
 
                     poffset = 0; // this is ensured for single step logging
                 
@@ -1125,8 +1151,20 @@ int cpu_exec(CPUArchState *env)
                             logbuf[i].esp,
                             logbuf[i].eflags,
                             logbuf[i].fs);
+                            
+                            
+                            
+                    if (OP_FLAG == 1) {
+                        example_user_t *tmp1;
+                        uint64_t eip_key = logbuf[i].eip;
+                        HASH_FIND_INT(users,&eip_key,tmp1);
+                        //printf("%s",tmp1->string);
+                        fprintf(logfile,"%s",tmp1->string);
+                    }
+                    
+
    
-#endif
+//#endif
 // single step logging end
 
 
@@ -1134,7 +1172,7 @@ int cpu_exec(CPUArchState *env)
 
 
 // buffer logging start
-//#if 0
+#if 0
                     
                     logbuf[poffset].type = 123;
                     //logbuf[poffset].eip = tb->pc;
@@ -1161,7 +1199,7 @@ int cpu_exec(CPUArchState *env)
                     
                     poffset++;
                     
-                    if(poffset>=1000000) { 
+                    if(poffset>=1000000) {
                     
                         for(i=0;i<=999999;i++)
                         {
@@ -1194,7 +1232,7 @@ int cpu_exec(CPUArchState *env)
                             }
                             
                             else if (logbuf[i].type == 456) {
-                                fprintf(logfile,"%6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx "\n",
+                                fprintf(logfile,"INT %6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx "\n",
                                 
                                 logbuf[i].count,
                                 logbuf[i].intno,
@@ -1213,7 +1251,7 @@ int cpu_exec(CPUArchState *env)
                     }
 
 
-//#endif
+#endif
 // buffer logging end
 
 

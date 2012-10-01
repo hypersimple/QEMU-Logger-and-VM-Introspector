@@ -1683,6 +1683,11 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
         if ((env->cr[0] & CR0_PE_MASK)) {
             static int count;
             
+            
+            
+            //start for buffer logging
+            #if 0
+            
             logbuf[poffset].type = 456;
             logbuf[poffset].count = count;
             logbuf[poffset].intno = intno;
@@ -1700,8 +1705,14 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
             
             log_cpu_state(env, X86_DUMP_CCOP);
             
-            /*
-            qemu_log("%6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx,
+            #endif
+            //end start for buffer logging
+            
+            
+            //start for single logging
+            //#if 0
+
+            qemu_log("INT %6d: v=%02x e=%04x i=%d cpl=%d IP=%04x:" TARGET_FMT_lx " pc=" TARGET_FMT_lx " SP=%04x:" TARGET_FMT_lx,
                     count, intno, error_code, is_int,
                     env->hflags & HF_CPL_MASK,
                     env->segs[R_CS].selector, EIP,
@@ -1714,7 +1725,12 @@ static void do_interrupt_all(int intno, int is_int, int error_code,
             }
             qemu_log("\n");
             log_cpu_state(env, X86_DUMP_CCOP);
-            */
+
+            //endif
+            //end for single logging
+
+
+            
 #if 0
             {
                 int i;
