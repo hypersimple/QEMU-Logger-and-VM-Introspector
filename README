@@ -1,1 +1,62 @@
-A modified version.
+(1) Continuous micro-operation logging functionality of QEMU
+
+Traditionally, when translating, QEMU only stores the final host instructions in a cache. 
+This component maintains a hash table for TCG ops, and inserts them into every guest instruction, together with the guest CPU states, providing the continuous micro-op logging functionality.
+
+How to use:
+Just type in the following command in the conole, the original logging functionality will be replaced with this one:
+
+stop (pause the virtual machine, optional)
+info registers (read the registers' information, optional)
+log int,exec,op,op_opt (log all the micro-operations, register states, and interrupts/exceptions)
+cont (continue the virtual machine, optional)
+
+
+
+The log format is as follows, self-explained:
+(In the following example (x86): first, CPU register values; then TCG micro-op instructions; last there is an interrupt, the states when it occurs are logged.)
+
+====================================================================
+
+EIP=78aba599 CR3=19493000 EAX=00000001
+EBX=043ab8d0 ECX=0000000b EDX=008f0040
+ESI=037e0510 EDI=78b52028 EBP=0012aa04
+ESP=0012a9cc EFLAGS=00000246 FS_BASE=7ffdf000
+...... (more CPU registers)
+
+ ---- 0x78aba599
+# mov_i32 tmp2,ebp
+# movi_i32 tmp12,$0x8
+# add_i32 tmp2,tmp2,tmp12
+# qemu_ld32 tmp0,tmp2,$0x1
+# mov_i32 eax,tmp0
+
+ ---- 0x78aba59c
+# mov_i32 tmp0,eax
+# mov_i32 tmp1,eax
+# discard cc_src
+# and_i32 cc_dst,tmp0,tmp1
+
+ ---- 0x78aba59e
+# movi_i32 cc_op,$0x18
+# movi_i32 tmp12,$0x0
+# brcond_i32 cc_dst,tmp12,eq,$0x0
+# goto_tb $0x0
+# movi_i32 tmp4,$0x78aba5a4
+# st_i32 tmp4,env,$0x20
+# exit_tb
+# set_label $0x0
+# movi_i32 tmp4,$0x78ad86ba
+# st_i32 tmp4,env,$0x20
+# exit_tb
+# end
+
+INT    201: v=d1 e=0000 i=0 cpl=3
+IP=001b:78aba599 pc=78aba599
+SP=0023:0012a9cc EAX=00000000
+
+====================================================================
+
+
+
+
