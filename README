@@ -65,5 +65,5 @@ SP=0023:0012a9cc EAX=00000000
 
 (2) VM-basd Browser/Application Introspection Gadgets, based on QEMU.
 
-For example, to get the firefox console.log output, we could intercept the fputs (78b0379c) API function.
+For example, to get the firefox console.log output, we could intercept the fputs (78b0379c) API function on Windows XP.
 More info is to be updated.
