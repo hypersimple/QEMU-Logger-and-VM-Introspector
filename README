@@ -6,11 +6,15 @@ This component maintains a hash table for TCG ops, and inserts them into every g
 How to use:
 Just type in the following command in the conole, the original logging functionality will be replaced with this one:
 
+====================================================================
 stop (pause the virtual machine, optional)
 info registers (read the registers' information, optional)
 log int,exec,op,op_opt (log all the micro-operations, register states, and interrupts/exceptions)
 cont (continue the virtual machine, optional)
-
+stop
+log none (stop logging)
+info registers
+====================================================================
 
 
 The log format is as follows, self-explained:
@@ -59,4 +63,7 @@ SP=0023:0012a9cc EAX=00000000
 
 
 
+(2) VM-basd Browser/Application Introspection Gadgets, based on QEMU.
 
+For example, to get the firefox console.log output, we could intercept the fputs (78b0379c) API function.
+More info is to be updated.
