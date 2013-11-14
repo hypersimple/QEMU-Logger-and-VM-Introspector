@@ -3,6 +3,12 @@
 Traditionally, when translating, QEMU only stores the final host instructions in a cache. 
 This component maintains a hash table for TCG ops, and inserts them into every guest instruction, together with the guest CPU states, providing the continuous micro-op logging functionality.
 
+
+How to install:
+Install it like the normal QEMU, but should be the debug mode.
+"Configure" it as the debug mode and other options as you need, and "make", "make install".
+
+
 How to use:
 Just type in the following command in the conole, the original logging functionality will be replaced with this one:
 
