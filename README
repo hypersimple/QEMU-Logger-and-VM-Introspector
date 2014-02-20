@@ -1,7 +1,8 @@
 (1) Continuous micro-operation logging functionality of QEMU
 
-Traditionally, when translating, QEMU only stores the final host instructions in a cache. 
-This component maintains a hash table for TCG ops, and inserts them into every guest instruction, together with the guest CPU states, providing the continuous micro-op logging functionality.
+When translating, QEMU only stores the final host instructions in a cache.
+Originally, the logging functionality of QEMU only logs instructions(in_asm, micro-op, out_asm) when translating.
+This component maintains a hash table for TCG micro-ops, and inserts them into every guest instruction, together with the guest CPU states, providing the continuous micro-op logging functionality.
 
 
 How to install:
