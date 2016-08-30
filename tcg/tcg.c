@@ -70,6 +70,8 @@
 
 //newnew
 #include "../target-i386/mydef.h"
+
+#define MAX_LOG_STRING_SIZE 15000
 //newend
 
 
@@ -904,13 +906,10 @@ void tcg_dump_ops2(TCGContext *s, FILE *outfile, example_user_t *user)
     opc_ptr = gen_opc_buf;
     args = gen_opparam_buf;
     
-
-
     
-    user->string = (char*)malloc(15000);
-    //XXX: here: the size maybe not enough, can be set to 30000
+    
+    user->string = (char*)malloc(MAX_LOG_STRING_SIZE);
     *(user->string) = '\0';
-
 
 
     
@@ -942,7 +941,6 @@ void tcg_dump_ops2(TCGContext *s, FILE *outfile, example_user_t *user)
         
         
         
-        
         if (c == INDEX_op_debug_insn_start) {
             uint64_t pc;
 #if TARGET_LONG_BITS > TCG_TARGET_REG_BITS
@@ -960,7 +958,6 @@ void tcg_dump_ops2(TCGContext *s, FILE *outfile, example_user_t *user)
         } 
         
         
-        
         else if (c == INDEX_op_call) {
             TCGArg arg;
 
@@ -970,13 +967,13 @@ void tcg_dump_ops2(TCGContext *s, FILE *outfile, example_user_t *user)
             nb_iargs = arg & 0xffff;
             nb_cargs = def->nb_cargs;
 
-//newnew
+
             sprintf(tmpbuf, "# %s ", def->name);
             strcat(user->string,tmpbuf);
             
             //fprintf(outfile, " %s ", def->name);
             //Add "#" to all the statements in the following
-//newend
+
 
             /* function name */
             sprintf(tmpbuf, "%s",
@@ -1219,7 +1216,7 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
             if (!first_insn) 
                 fprintf(outfile, "\n");
                 
-            //newnew back
+
             //fprintf(outfile, "@ ---- 0x%" PRIx64, pc);
             fprintf(outfile, " ---- 0x%" PRIx64, pc);
             
@@ -1238,11 +1235,11 @@ void tcg_dump_ops(TCGContext *s, FILE *outfile)
             nb_iargs = arg & 0xffff;
             nb_cargs = def->nb_cargs;
 
-//newnew
+
             fprintf(outfile, "# %s ", def->name);
             //fprintf(outfile, " %s ", def->name);
             //Add "#" to all the statements in the following
-//newend
+
 
             /* function name */
             fprintf(outfile, "%s",
@@ -2383,7 +2380,7 @@ static inline int tcg_gen_code_common(TCGContext *s, uint8_t *gen_code_buf,
 
 #ifdef DEBUG_DISAS
     if (unlikely(qemu_loglevel_mask(CPU_LOG_TB_OP))) {
-    //newnew
+
         //qemu_log("OP:\n");
         
         if ( (user = (example_user_t*)malloc(sizeof(example_user_t))) == NULL) 
