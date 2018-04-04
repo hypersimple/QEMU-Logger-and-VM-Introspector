@@ -77,4 +77,7 @@ More info is to be updated.
 
 
 
-TODO: Remove object files and other generated files.
+Note:
+The code is a quick research prototype, instead of a mature product.
+Some code is not well-organized and not clean (e.g., use hard-coded numbers instead of macros).
+
